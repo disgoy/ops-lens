@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -43,3 +43,13 @@ def list_projects(db: Annotated[Session, Depends(get_db)]):
 @app.get("/issues", response_model=list[IssueRead])
 def list_issues(db: Annotated[Session, Depends(get_db)]):
     return db.scalars(select(Issue).order_by(Issue.id)).all()
+
+
+@app.get("/issues/{issue_id}", response_model=IssueRead)
+def get_issue(issue_id: int, db: Annotated[Session, Depends(get_db)]):
+    issue = db.get(Issue, issue_id)
+    if issue is None:
+        raise HTTPException(
+            status_code=404, detail=f"Issue {issue_id} not found"
+        )
+    return issue

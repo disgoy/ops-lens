@@ -156,3 +156,52 @@ def test_issues_returns_seeded_rows(client, db_session):
             "assignee_id": 1,
         },
     ]
+
+
+def test_get_issue_found(client, db_session):
+    team = Team(id=1, name="Payments")
+    project = Project(id=1, name="Payments API", team=team)
+    engineer = Engineer(
+        id=1,
+        name="Maya Sharma",
+        email="maya@example.com",
+        role="Backend Engineer",
+        team=team,
+    )
+    db_session.add_all(
+        [
+            team,
+            project,
+            engineer,
+            Issue(
+                id=142,
+                title="Payment requests are failing intermittently",
+                description="Fails intermittently.",
+                status="blocked",
+                priority="high",
+                project=project,
+                assignee=engineer,
+            ),
+        ]
+    )
+    db_session.commit()
+
+    response = client.get("/issues/142")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 142,
+        "title": "Payment requests are failing intermittently",
+        "description": "Fails intermittently.",
+        "status": "blocked",
+        "priority": "high",
+        "project_id": 1,
+        "assignee_id": 1,
+    }
+
+
+def test_get_issue_not_found(client):
+    response = client.get("/issues/999")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Issue 999 not found"}
