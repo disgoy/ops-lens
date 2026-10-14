@@ -1,0 +1,18 @@
+# Runtime dependencies for OpsLens.
+# Install with: pip install -r requirements.txt
+# For testing tools, also install: pip install -r requirements-dev.txt
+
+# Web framework and response schemas.
+fastapi==0.143.0
+pydantic==2.14.0
+
+# ASGI server used to run the app (uvicorn main:app --reload).
+uvicorn[standard]==0.54.0
+
+# Database access: ORM, PostgreSQL driver, and migrations.
+SQLAlchemy==2.1.4
+psycopg[binary]==3.3.6
+alembic==1.20.0
+
+# Loads DB_* settings from the .env file.
+python-dotenv==1.2.4
