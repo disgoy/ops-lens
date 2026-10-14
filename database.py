@@ -1,10 +1,11 @@
 
 import os
+from collections.abc import Generator
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 # Load environment variables from the project's .env file.
 load_dotenv()
@@ -37,4 +38,11 @@ SessionLocal = sessionmaker(
 # Base class for our future database models.
 class Base(DeclarativeBase):
     pass
+
+
+# FastAPI dependency: provides one session per request and always
+# closes it afterwards, even if the request fails.
+def get_db() -> Generator[Session, None, None]:
+    with SessionLocal() as session:
+        yield session
 
